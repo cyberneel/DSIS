@@ -3,7 +3,6 @@ import easyocr
 import cv2
 import os
 import numpy as np
-
 # the ocr object that runs detection
 ocr = easyocr.Reader(['en'], gpu=True)
 
@@ -25,6 +24,7 @@ def ExtractNamesText(imgPath=None):
 
     # read the image
     image = cv2.imread(imgPath)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # run the OCR
     baseResult = ocr.readtext(imgPath, mag_ratio=8.0, adjust_contrast=2)
