@@ -3,6 +3,7 @@ import easyocr
 import cv2
 import os
 import numpy as np
+
 # the ocr object that runs detection
 ocr = easyocr.Reader(['en'], gpu=True)
 
