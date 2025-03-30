@@ -1,7 +1,7 @@
 import math
 import cv2
 import numpy as np
-
+import os
 
 def get_filter_arrow_image(threslold_image):
     blank_image = np.zeros_like(threslold_image)
@@ -87,25 +87,34 @@ def get_arrow_info(arrow_image):
                         point2, cv2.FONT_HERSHEY_PLAIN, 0.8, (0, 0, 255), 1)
             cv2.putText(arrow_info_image, "lenght : {0:0.2f}".format(lenght),
                         (point2[0], point2[1] + 20), cv2.FONT_HERSHEY_PLAIN, 0.8, (0, 0, 255), 1)
+            
+            arrow_info.append({
+                'angle': angle,
+                'length': lenght,
+                'point1': point1,
+                'point2': point2
+            })
 
         return arrow_info_image, arrow_info
     else:
         return None, None
 
 
-if __name__ == "__main__":
-    image = cv2.imread("./Design/Design.jpg")
+def NewArrowDetection(arrow_image='Design/Design.jpg', arrow_color_hex_lower='#FF0000', arrow_color_hex_upper='#FE0500'):
+    # use the relative path to the image
+    image = cv2.imread(os.path.join(os.path.dirname(__file__), arrow_image))
+    cv2.imshow("original_image", image)
 
-    # Filter only red color
     lower_red = np.array([0, 0, 100])
     upper_red = np.array([100, 100, 255])
     mask = cv2.inRange(image, lower_red, upper_red)
     image = cv2.bitwise_and(image, image, mask=mask)
-    cv2.imshow("image", image)
 
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _, thresh_image = cv2.threshold(gray_image, 100, 255, cv2.THRESH_BINARY_INV)
     cv2.imshow("thresh_image", thresh_image)
+
+    arrow_data = None
 
     arrow_image = get_filter_arrow_image(thresh_image)
     if arrow_image is not None:
@@ -115,6 +124,11 @@ if __name__ == "__main__":
         arrow_info_image, arrow_info = get_arrow_info(arrow_image)
         cv2.imshow("arrow_info_image", arrow_info_image)
         cv2.imwrite("arrow_info_image.png", arrow_info_image)
+        
+        arrow_data = arrow_info
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+    # return array of arrrows info
+    return arrow_data
